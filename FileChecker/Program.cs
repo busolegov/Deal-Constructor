@@ -5,16 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FileChecker.Models;
+using FileChecker.Controller;
 
 namespace FileChecker
 {
     class Program
     {
-        public static void ScanFolder(object obj)
-        {
-            Console.WriteLine("Запущено сканирование: " + DateTime.Now);
-        }
-
         static void Main(string[] args)
         {
             const string CURRENTPATH = @"C:\Users\6yc\Desktop\currentfolder";
@@ -22,24 +19,10 @@ namespace FileChecker
 
             try
             {
-                #region testregion
-                //FileService fileSerive = new FileService(CURRENTPATH, NEWPATH);
-                //string[] fileList = fileSerive.GetFilesArray(CURRENTPATH);
-
-                //List<FileData> fileScanned = fileSerive.GetFilesList(fileList);
-                //foreach (var item in fileSerive.fileList)
-                //{
-                //    Console.WriteLine(item.PathName);
-                //    Console.WriteLine(item.ChangedDate);
-                //    Console.WriteLine(item.Size);
-                //    Console.WriteLine("****************************");
-                //}
-
-                //TimerCallback timerCall = new TimerCallback(ScanFolder);
-                //Timer timer = new Timer(timerCall, null, 0, 5000);
-                #endregion
                 while (true)
                 {
+                    Console.WriteLine("Запущено сканирование: " + DateTime.Now);
+
                     FileService fileService = new FileService(CURRENTPATH, NEWPATH);
 
                     string[] firstTempArray = fileService.GetFilesArray(CURRENTPATH);
@@ -55,7 +38,7 @@ namespace FileChecker
                     {
                         foreach (var file in fileService.processedFileList)
                         {
-                            fileService.ReadFileDataAsync(file.PathName, $"{NEWPATH}/temp_{file.Name}");
+                            fileService.ReadFileDataAsync(file.PathName, $"{NEWPATH}/new_{file.Name}");
 
                             Console.WriteLine($"Просканирован файл {file.PathName}");
                         }
@@ -64,8 +47,6 @@ namespace FileChecker
                     Console.WriteLine();
                     Thread.Sleep(5000);
                 }
-                Console.ReadLine();
-
             }
             catch (Exception ex)
             {

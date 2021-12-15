@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Collections;
+using FileChecker.Models;
 
-namespace FileChecker
+namespace FileChecker.Controller
 {
     class FileService
     {
@@ -25,7 +26,7 @@ namespace FileChecker
         public List<FileData> tempFileList = new List<FileData>();
         public List<FileData> lastGameBlock = new List<FileData>();
 
-        public HistoryPattern historyPattern;
+
 
         /// <summary>
         /// Метод получения списка файлов в папке
@@ -38,6 +39,11 @@ namespace FileChecker
             return filesArray;
         }
 
+        /// <summary>
+        /// Обрезка имени файла.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public string NameCutter(string path) 
         {
             path = path.Substring(path.Length-92);
@@ -129,59 +135,34 @@ namespace FileChecker
                             tournamentHistory.ScanWithName(player, tournamentHistory.handHistoryList[i]);
                         }
                     }
-                    foreach (var player in tournamentHistory.playersInGame)
-                    {
-                        Console.WriteLine(player.Name);
-                        Console.WriteLine(player.Raises);
-                        Console.WriteLine(player.Posts);
-                        Console.WriteLine(player.Collected);
-                        Console.WriteLine(player.Calls);
-                    }
+
+                    tournamentHistory.GetAnte();
+                    tournamentHistory.GetSmallBlind();
+                    tournamentHistory.GetBigBlind();
+
+                    NewDealConstructor newDeal = new NewDealConstructor();
+                    newDeal.StackConstructor(tournamentHistory);
+
+                    //foreach (var player in tournamentHistory.playersInGame)
+                    //{
+                    //    Console.WriteLine(player.Name);
+                    //    Console.WriteLine(player.Button);
+                    //    Console.WriteLine(player.Raises);
+                    //    Console.WriteLine(player.Posts);
+                    //    Console.WriteLine(player.Collected);
+                    //    Console.WriteLine(player.Calls);
+                    //}
                     //data = string.Join("", GetLastGameBlock(data).ToArray());
                     using (StreamWriter fileDataWriter = new StreamWriter(newPath, false, Encoding.UTF8))
                     {
-                        await fileDataWriter.WriteAsync(data);
+                        await fileDataWriter.WriteAsync(newDeal.NewDeal(tournamentHistory));
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Возникла ошибка при чтении из файла: {ex.Message}");
+                Console.WriteLine($"Возникла ошибка при чтении или записи файла: {ex.Message}");
             }
         }
-
-        /// <summary>
-        /// Метод, забирающий последнюю известную раздачу.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        //public List<string> GetLastGameBlock(string text)
-        //{
-        //    List <int> gameBlockCount = new List<int>();
-        //    string[] allLinesArray = text.Split('\n');
-        //    for (int i = 0; i < allLinesArray.Length-1; i++)
-        //    {                                                                                   //удалить лишнее
-        //        if (allLinesArray[i].Contains("#Game No"))
-        //        {
-        //            gameBlockCount.Add(i);
-        //        }
-        //    }
-            
-
-        //    int count = (allLinesArray.Length - 3) - gameBlockCount.Last();
-        //    string [] lastGameBlockArray = new string[count];
-        //    for (int i = gameBlockCount.Last(), k = 0; i < (allLinesArray.Length - 3); i++, k ++)
-        //    {
-        //        lastGameBlockArray[k] = allLinesArray[i]; 
-        //    }
-
-
-        //    for (int k = gameBlockCount.Last(); k < allLinesArray.Length-3; k++)
-        //    {
-        //        handHistory.handHistoryLineList.Add(allLinesArray[k]);
-        //    }
-        //    return handHistory.handHistoryLineList;
-        //}
-
     }
 }

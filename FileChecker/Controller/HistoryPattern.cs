@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FileChecker
+namespace FileChecker.Models
 {
-    class HistoryPattern
+    internal class HistoryPattern
     {
         public HistoryPattern(string data)
         {
@@ -15,14 +16,13 @@ namespace FileChecker
         }
         public int SmallBlind { get; set; }
         public int BigBlind { get; set; }
-
         public int Ante { get; set; }
 
         /// <summary>
         /// Количество игроков
         /// </summary>
         public int playerCount;
-        
+
         private string _tournamentHH;
 
         public string TournamentHH
@@ -35,38 +35,88 @@ namespace FileChecker
         public List<Player> playersInGame = new List<Player>();
 
 
-        //public List<string> GetHeader() 
-        //{
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        header.Add(handHistoryList[i]);
-        //    }
-        //    return header;
-        //}
-
         /// <summary>
-        /// Последняя раздача.
+        /// Последняя раздача из файла.
         /// </summary>
         public void GetLastGameBlock()
         {
-            List<int> gameBlockCount = new List<int>();
+            List<int> gameBlockIndex = new List<int>();
             string[] allLinesArray = TournamentHH.Split('\n');
             for (int i = 0; i < allLinesArray.Length - 1; i++)
             {                                                                                   
                 if (allLinesArray[i].Contains("#Game No"))
                 {
-                    gameBlockCount.Add(i);
+                    gameBlockIndex.Add(i);
                 }
             }
 
-            int count = (allLinesArray.Length - 3) - gameBlockCount.Last();
+            int count = (allLinesArray.Length - 3) - gameBlockIndex.Last();
             string[] lastGameBlockArray = new string[count];
-            for (int i = gameBlockCount.Last(), k = 0; i < (allLinesArray.Length - 3); i++, k++)
+            for (int i = gameBlockIndex.Last(), k = 0; i < (allLinesArray.Length - 3); i++, k++)
             {
                 handHistoryList.Add(allLinesArray[i]);
                 lastGameBlockArray[k] = allLinesArray[i];
             }
         }
+
+        public void GetAnte() 
+        {
+            foreach (var line in handHistoryList)
+            {
+                if (line.Contains($"ante"))
+                {
+                    Ante = GetNumberInSquareBrackets(line);
+                    break;
+                }
+            }
+        }
+
+        public void GetSmallBlind()
+        {
+            foreach (var line in handHistoryList)
+            {
+                if (line.Contains($"small blind"))
+                {
+                    SmallBlind = GetNumberInSquareBrackets(line);
+                    Regex regexName = new Regex(@"(\S*)");
+                    Match matchName = regexName.Match(line);
+                    string name = matchName.Value;
+                    foreach (var player in playersInGame)
+                    {
+                        if (name == player.Name)
+                        {
+                            player.SmallBlind = true;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        public void GetBigBlind()
+        {
+            foreach (var line in handHistoryList)
+            {
+                if (line.Contains($"big blind"))
+                {
+                    BigBlind = GetNumberInSquareBrackets(line);
+                    Regex regexName = new Regex(@"(\S*)");
+                    Match matchName = regexName.Match(line);
+                    string name = matchName.Value;
+                    foreach (var player in playersInGame)
+                    {
+                        if (name == player.Name)
+                        {
+                            player.BigBlind = true;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Количество игроков.
@@ -88,7 +138,6 @@ namespace FileChecker
 
         public void GetDealPlayersInfo(string line) 
         {
-
             char number = line[5];
             int seatNumber = Int32.Parse(number.ToString());
             line = line.Substring(8);
@@ -96,15 +145,21 @@ namespace FileChecker
             Match matchName = regexName.Match(line);
             string name = matchName.Value;
             int chips = GetNumberInRoundBrackets(line);
-
             playersInGame.Add(new Player
             {
                 SeatNumber = seatNumber,
                 Name = name,
                 StartChips = chips
             });
+            GetButton();
+
         }
 
+        /// <summary>
+        /// Выборка ников.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="line"></param>
         public void ScanWithName(Player player, string line)
         {
 
@@ -123,6 +178,24 @@ namespace FileChecker
             if (line.Contains($"{player.Name} collected"))
             {
                 player.Collected =+ GetNumberInSquareBrackets(line);
+            }
+        }
+
+        /// <summary>
+        /// Баттон.
+        /// </summary>
+        /// <param name="list"></param>
+        public void GetButton() 
+        {
+            char seat = handHistoryList[4][5];
+            int buttonSeat = Int32.Parse(seat.ToString());
+            foreach (var player in playersInGame)
+            {
+                if (buttonSeat == player.SeatNumber)
+                {
+                    player.Button = true;
+                    break;
+                }
             }
         }
 
@@ -167,13 +240,5 @@ namespace FileChecker
             }
             return chips;
         }
-
-
-
-
-
-
-
-
     }
 }

@@ -58,10 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileData.cs" />
-    <Compile Include="FileService.cs" />
-    <Compile Include="HistoryPattern.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Models\PlayersList.cs" />
+    <Compile Include="Models\FileData.cs" />
+    <Compile Include="Controller\FileService.cs" />
+    <Compile Include="Controller\HistoryPattern.cs" />
+    <Compile Include="Controller\NewDealConstructor.cs" />
+    <Compile Include="Models\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
