@@ -23,6 +23,8 @@ namespace FileChecker.Models
         /// </summary>
         public int playerCount;
 
+        public int ActionSum { get; set; }
+
         private string _tournamentHH;
 
         public string TournamentHH
@@ -71,7 +73,7 @@ namespace FileChecker.Models
             }
         }
 
-        public void GetSmallBlind()
+        public void GetSmallBlindPosition()
         {
             foreach (var line in handHistoryList)
             {
@@ -85,7 +87,7 @@ namespace FileChecker.Models
                     {
                         if (name == player.Name)
                         {
-                            player.SmallBlind = true;
+                            player.BoolSmallBlind = true;
                             break;
                         }
                     }
@@ -94,7 +96,7 @@ namespace FileChecker.Models
             }
         }
 
-        public void GetBigBlind()
+        public void GetBigBlindPosition()
         {
             foreach (var line in handHistoryList)
             {
@@ -108,11 +110,40 @@ namespace FileChecker.Models
                     {
                         if (name == player.Name)
                         {
-                            player.BigBlind = true;
+                            player.BoolBigBlind = true;
                             break;
                         }
                     }
                     break;
+                }
+            }
+        }
+        
+        public void GetButtonPostion()
+        {
+            char seat = handHistoryList[4][5];
+            int buttonSeat = Int32.Parse(seat.ToString());
+            foreach (var player in playersInGame)
+            {
+                if (buttonSeat == player.SeatNumber)
+                {
+                    player.Button = true;
+                    break;
+                }
+            }
+        }
+
+        public void SetBlindsToPlayer()
+        {
+            foreach (var player in playersInGame)
+            {
+                if (player.BoolBigBlind)
+                {
+                    player.IntBigBlind = BigBlind;
+                }
+                if (player.BoolSmallBlind)
+                {
+                    player.IntSmallBlind = SmallBlind;
                 }
             }
         }
@@ -125,15 +156,8 @@ namespace FileChecker.Models
         /// <returns></returns>
         public void GetNumberOfPlayers()
         {
-            try
-            {
-                char count = handHistoryList[5][26];
-                playerCount = Int32.Parse(count.ToString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{ ex.Message}");
-            }
+            char count = handHistoryList[5][26];
+            playerCount = Int32.Parse(count.ToString());
         }
 
         public void GetDealPlayersInfo(string line) 
@@ -151,8 +175,8 @@ namespace FileChecker.Models
                 Name = name,
                 StartChips = chips
             });
-            GetButton();
-
+            GetButtonPostion();
+            SetBlindsToPlayer();
         }
 
         /// <summary>
@@ -165,42 +189,34 @@ namespace FileChecker.Models
 
             if (line.Contains($"{player.Name} posts"))
             {
-                player.Posts =+ GetNumberInSquareBrackets(line);
+                player.Posts += GetNumberInSquareBrackets(line);
             }
             if (line.Contains($"{player.Name} raises"))
             {
-                player.Raises =+ GetNumberInSquareBrackets(line);
+                player.Raises += GetNumberInSquareBrackets(line);
             }
             if (line.Contains($"{player.Name} calls"))
             {
-                player.Calls =+ GetNumberInSquareBrackets(line);
+                player.Calls += GetNumberInSquareBrackets(line);
             }
             if (line.Contains($"{player.Name} collected"))
             {
-                player.Collected =+ GetNumberInSquareBrackets(line);
+                player.Collected += GetNumberInSquareBrackets(line);
             }
         }
 
-        /// <summary>
-        /// Баттон.
-        /// </summary>
-        /// <param name="list"></param>
-        public void GetButton() 
+        public void PlayersActionSum() 
         {
-            char seat = handHistoryList[4][5];
-            int buttonSeat = Int32.Parse(seat.ToString());
             foreach (var player in playersInGame)
             {
-                if (buttonSeat == player.SeatNumber)
-                {
-                    player.Button = true;
-                    break;
-                }
+                ActionSum += player.Posts + player.Raises + player.Calls;
             }
+            ActionSum += SmallBlind + BigBlind + Ante * playerCount;
         }
 
+
         /// <summary>
-        /// Число в квадратных скобках
+        /// Парсинг числа в квадратных скобках
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
@@ -221,7 +237,7 @@ namespace FileChecker.Models
         }
 
         /// <summary>
-        /// Число в круглых скобках
+        /// Парсинг числа в круглых скобках
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>

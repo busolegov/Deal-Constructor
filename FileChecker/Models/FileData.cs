@@ -12,12 +12,6 @@ namespace FileChecker.Models
         public string PathName { get; set; }
         public string Name { get; set; }
         public DateTime ChangedDate { get; set; }
-
         public byte Size { get; set; }
-
-        //public string Data { get; set; }
-
-        //public bool isChanged = false;
-
     }
 }

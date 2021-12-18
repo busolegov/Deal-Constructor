@@ -8,20 +8,26 @@ namespace FileChecker.Models
 {
     internal class NewDealConstructor
     {
+        public NewDealConstructor(HistoryPattern pattern)
+        {
+            HistoryDealPlayerList = pattern.playersInGame;
+        }
+
         string buttonSeat;
         string smallBlindName;
         string bigBlindName;
 
-        public List<Player> playerList = new List<Player>();
+        public List<Player> HistoryDealPlayerList { get; set; }
+        public List<Player> NewDealPlayerList { get; set; }
+
         public List<string> newDeal = new List<string>();
         public void StackConstructor(HistoryPattern pattern) 
         {
             foreach (var player in pattern.playersInGame)
             {
-                int newStack = player.StartChips - player.Posts;
-                playerList.Add(new Player
+                NewDealPlayerList.Add(new Player
                 {
-                    StartChips = newStack,
+                    StartChips = NewStackConstructor(),
                     SeatNumber = player.SeatNumber,
                     Name = player.Name
                 });
@@ -31,6 +37,23 @@ namespace FileChecker.Models
             MoveBigBlind(pattern);
         }
 
+
+
+        public int NewStackConstructor(HistoryPattern pattern, Player player) 
+        {
+            int newStack;
+            if (player.Collected > 0)
+            {
+                newStack = player.StartChips + pattern.ActionSum - player.Raises - player.Posts - player.Calls - player.IntBigBlind - player.IntSmallBlind - pattern.Ante;
+                return newStack;
+            }
+            else
+            {
+                newStack = player.StartChips;
+                return newStack;
+            }
+        }
+
         public void MoveButton(HistoryPattern pattern) 
         {
             foreach (var player in pattern.playersInGame)
@@ -38,14 +61,14 @@ namespace FileChecker.Models
                 if (player.Button == true)
                 {
                     int position = pattern.playersInGame.IndexOf(player);
-                    if (position >= playerList.Count-1)
+                    if (position >= NewDealPlayerList.Count-1)
                     {
-                        playerList[0].Button = true;
+                        NewDealPlayerList[0].Button = true;
                         break;
                     }
                     else
                     {
-                        playerList[position++].Button = true;
+                        NewDealPlayerList[position++].Button = true;
                         break;
                     }
                 }
@@ -56,18 +79,18 @@ namespace FileChecker.Models
         {
             foreach (var player in pattern.playersInGame)
             {
-                if (player.SmallBlind == true)
+                if (player.BoolSmallBlind == true)
                 {
                     int position = pattern.playersInGame.IndexOf(player);
-                    player.SmallBlind = false;
-                    if (position >= playerList.Count-1)
+                    player.BoolSmallBlind = false;
+                    if (position >= NewDealPlayerList.Count-1)
                     {
-                        playerList[0].SmallBlind = true;
+                        NewDealPlayerList[0].BoolSmallBlind = true;
                         break;
                     }
                     else
                     {
-                        playerList[position++].SmallBlind = true;
+                        NewDealPlayerList[position++].BoolSmallBlind = true;
                         break;
                     }
                 }
@@ -78,37 +101,37 @@ namespace FileChecker.Models
         {
             foreach (var player in pattern.playersInGame)
             {
-                if (player.BigBlind == true)
+                if (player.BoolBigBlind == true)
                 {
                     int position = pattern.playersInGame.IndexOf(player);
-                    player.BigBlind = false;
-                    if (position >= playerList.Count-1)
+                    player.BoolBigBlind = false;
+                    if (position >= NewDealPlayerList.Count-1)
                     {
-                        playerList[0].BigBlind = true;
+                        NewDealPlayerList[0].BoolBigBlind = true;
                         break;
                     }
                     else
                     {
-                        playerList[position++].BigBlind = true;
+                        NewDealPlayerList[position++].BoolBigBlind = true;
                         break;
                     }
                 }
             }
         }
 
-        public string NewDeal(HistoryPattern pattern)
+        public string NewDealConstructor(HistoryPattern pattern)
         {
-            foreach (var player in playerList)
+            foreach (var player in NewDealPlayerList)
             {
                 if (player.Button == true)                
                 {
                     buttonSeat = player.SeatNumber.ToString();
                 }
-                if (player.SmallBlind == true)
+                if (player.BoolSmallBlind == true)
                 {
                     smallBlindName = player.Name;
                 }
-                if (player.BigBlind == true)
+                if (player.BoolBigBlind == true)
                 {
                     bigBlindName = player.Name;
                 }
@@ -121,11 +144,11 @@ namespace FileChecker.Models
             newData += pattern.handHistoryList[3];
             newData += String.Format("Seat {0} is the button\r", buttonSeat);
             newData += pattern.handHistoryList[5];
-            foreach (var player in playerList)
+            foreach (var player in NewDealPlayerList)
             {
                 newData += String.Format("Seat {0}: {1} ({2})\r", player.SeatNumber.ToString(), player.Name.ToString(), player.StartChips.ToString());
             }
-            foreach (var player in playerList)
+            foreach (var player in NewDealPlayerList)
             {
                 newData += String.Format("{0} posts ante [{1}]\r", player.Name, pattern.Ante.ToString());
             }

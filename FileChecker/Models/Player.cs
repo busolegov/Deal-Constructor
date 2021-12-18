@@ -13,8 +13,10 @@ namespace FileChecker.Models
         public int SeatNumber { get; set; }
         public int StartChips { get; set; }
         public bool Button { get; set; }
-        public bool SmallBlind { get; set; }
-        public bool BigBlind { get; set; }
+        public bool BoolSmallBlind { get; set; }
+        public int IntSmallBlind { get; set; }
+        public bool BoolBigBlind { get; set; }
+        public int IntBigBlind { get; set; }
         public int Posts { get; set; }
         public int Raises { get; set; }
         public int Calls { get; set; }

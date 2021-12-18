@@ -122,7 +122,7 @@ namespace FileChecker.Controller
                     HistoryPattern tournamentHistory = new HistoryPattern(data);
                     tournamentHistory.GetLastGameBlock();
                     tournamentHistory.GetNumberOfPlayers();
-
+                    tournamentHistory.PlayersActionSum();
                     for (int i = 6; i < 6 + tournamentHistory.playerCount; i++)
                     {
                         tournamentHistory.GetDealPlayersInfo(tournamentHistory.handHistoryList[i]);
@@ -137,22 +137,12 @@ namespace FileChecker.Controller
                     }
 
                     tournamentHistory.GetAnte();
-                    tournamentHistory.GetSmallBlind();
-                    tournamentHistory.GetBigBlind();
+                    tournamentHistory.GetSmallBlindPosition();
+                    tournamentHistory.GetBigBlindPosition();
 
                     NewDealConstructor newDeal = new NewDealConstructor();
                     newDeal.StackConstructor(tournamentHistory);
 
-                    //foreach (var player in tournamentHistory.playersInGame)
-                    //{
-                    //    Console.WriteLine(player.Name);
-                    //    Console.WriteLine(player.Button);
-                    //    Console.WriteLine(player.Raises);
-                    //    Console.WriteLine(player.Posts);
-                    //    Console.WriteLine(player.Collected);
-                    //    Console.WriteLine(player.Calls);
-                    //}
-                    //data = string.Join("", GetLastGameBlock(data).ToArray());
                     using (StreamWriter fileDataWriter = new StreamWriter(newPath, false, Encoding.UTF8))
                     {
                         await fileDataWriter.WriteAsync(newDeal.NewDeal(tournamentHistory));
