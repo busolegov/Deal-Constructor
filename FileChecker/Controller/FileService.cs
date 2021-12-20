@@ -79,13 +79,12 @@ namespace FileChecker.Controller
                 processedFileList.Add(new FileData
                 { 
                     PathName = array[i],
-                    ChangedDate = GetFileDate(array[i]),
-                    Size = GetFileSize(array[i]),
                     Name = NameCutter(array[i])
                 });
             }
             return processedFileList;
         }
+
 
         /// <summary>
         /// Метод сравнения размеров файлов - bool
@@ -105,13 +104,39 @@ namespace FileChecker.Controller
             }
         }
 
+        public void GetStructure(HistoryPattern pattern) 
+        {
+            pattern.GetLastGameBlock();
+            pattern.GetNumberOfPlayers();
+            pattern.PlayersActionSum();
+            for (int i = 6; i < 6 + pattern.playerCount; i++)
+            {
+                pattern.GetDealPlayersInfo(pattern.handHistoryList[i]);
+            }
+
+            for (int i = 7 + pattern.playerCount; i < pattern.handHistoryList.Count; i++)
+            {
+                foreach (var player in pattern.playersInGame)
+                {
+                    pattern.ScanWithName(player, pattern.handHistoryList[i]);
+                }
+            }
+
+            pattern.GetAnte();
+            pattern.GetSmallBlindPosition();
+            pattern.GetBigBlindPosition();
+            pattern.GetButtonPostion();
+            pattern.SetBlindsAndAnteToPlayer();
+            pattern.PlayersActionSum();
+        }
+
+
         /// <summary>
         /// Асинхронный метод чтения и записи файла.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="buffer"></param>
-
-        public async void ReadFileDataAsync (string currentPath, string newPath) 
+        public async void ReadWriteFileDataAsync (string currentPath, string newPath) 
         {
             try
             {
@@ -120,32 +145,15 @@ namespace FileChecker.Controller
                     string data = fileDataReader.ReadToEnd();
                     
                     HistoryPattern tournamentHistory = new HistoryPattern(data);
-                    tournamentHistory.GetLastGameBlock();
-                    tournamentHistory.GetNumberOfPlayers();
-                    tournamentHistory.PlayersActionSum();
-                    for (int i = 6; i < 6 + tournamentHistory.playerCount; i++)
-                    {
-                        tournamentHistory.GetDealPlayersInfo(tournamentHistory.handHistoryList[i]);
-                    }
 
-                    for (int i = 7 + tournamentHistory.playerCount; i < tournamentHistory.handHistoryList.Count; i++)
-                    {
-                        foreach (var player in tournamentHistory.playersInGame)
-                        {
-                            tournamentHistory.ScanWithName(player, tournamentHistory.handHistoryList[i]);
-                        }
-                    }
+                    GetStructure(tournamentHistory);
 
-                    tournamentHistory.GetAnte();
-                    tournamentHistory.GetSmallBlindPosition();
-                    tournamentHistory.GetBigBlindPosition();
-
-                    NewDealConstructor newDeal = new NewDealConstructor();
-                    newDeal.StackConstructor(tournamentHistory);
+                    NewDealConstructor newDeal = new NewDealConstructor(tournamentHistory);
+                    newDeal.PlayersConstructor();
 
                     using (StreamWriter fileDataWriter = new StreamWriter(newPath, false, Encoding.UTF8))
                     {
-                        await fileDataWriter.WriteAsync(newDeal.NewDeal(tournamentHistory));
+                        await fileDataWriter.WriteAsync(newDeal.NewDealTextConstructor());
                     }
                 }
             }

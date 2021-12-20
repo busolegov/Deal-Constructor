@@ -14,7 +14,7 @@ namespace FileChecker
     {
         static void Main(string[] args)
         {
-            const string CURRENTPATH = @"C:\Users\6yc\Desktop\currentfolder";
+            const string CURRENTPATH = @"C:\Users\6yc\Documents\888poker\HandHistory\busolegov";
             const string NEWPATH = @"C:\Users\6yc\Desktop\newfolder";
 
             try
@@ -38,7 +38,7 @@ namespace FileChecker
                     {
                         foreach (var file in fileService.processedFileList)
                         {
-                            fileService.ReadFileDataAsync(file.PathName, $"{NEWPATH}/new_{file.Name}");
+                            fileService.ReadWriteFileDataAsync(file.PathName, $"{NEWPATH}/new_{file.Name}");
 
                             Console.WriteLine($"Просканирован файл {file.PathName}");
                         }

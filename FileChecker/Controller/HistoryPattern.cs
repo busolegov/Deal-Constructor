@@ -68,7 +68,7 @@ namespace FileChecker.Models
                 if (line.Contains($"ante"))
                 {
                     Ante = GetNumberInSquareBrackets(line);
-                    break;
+                    return;
                 }
             }
         }
@@ -88,10 +88,9 @@ namespace FileChecker.Models
                         if (name == player.Name)
                         {
                             player.BoolSmallBlind = true;
-                            break;
+                            return;
                         }
                     }
-                    break;
                 }
             }
         }
@@ -111,10 +110,9 @@ namespace FileChecker.Models
                         if (name == player.Name)
                         {
                             player.BoolBigBlind = true;
-                            break;
+                            return;
                         }
                     }
-                    break;
                 }
             }
         }
@@ -128,15 +126,17 @@ namespace FileChecker.Models
                 if (buttonSeat == player.SeatNumber)
                 {
                     player.Button = true;
-                    break;
+                    return;
                 }
             }
         }
 
-        public void SetBlindsToPlayer()
+        public void SetBlindsAndAnteToPlayer()
         {
             foreach (var player in playersInGame)
             {
+                player.IntAnte = Ante;
+
                 if (player.BoolBigBlind)
                 {
                     player.IntBigBlind = BigBlind;
@@ -176,7 +176,7 @@ namespace FileChecker.Models
                 StartChips = chips
             });
             GetButtonPostion();
-            SetBlindsToPlayer();
+            SetBlindsAndAnteToPlayer();
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace FileChecker.Models
         public void ScanWithName(Player player, string line)
         {
 
-            if (line.Contains($"{player.Name} posts"))
+            if (line.Contains($"{player.Name} posts ["))
             {
                 player.Posts += GetNumberInSquareBrackets(line);
             }

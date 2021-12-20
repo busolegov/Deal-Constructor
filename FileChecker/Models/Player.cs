@@ -17,6 +17,7 @@ namespace FileChecker.Models
         public int IntSmallBlind { get; set; }
         public bool BoolBigBlind { get; set; }
         public int IntBigBlind { get; set; }
+        public int IntAnte { get; set; }
         public int Posts { get; set; }
         public int Raises { get; set; }
         public int Calls { get; set; }
