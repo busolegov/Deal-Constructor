@@ -12,9 +12,13 @@ namespace FileChecker.Models
         {
             HistoryDealPlayerList = pattern.playersInGame;
             HistoryDeal = pattern;
+            PlayerCount = pattern.playerCount;
+
         }
 
         public HistoryPattern HistoryDeal { get; set; }
+
+        public int PlayerCount { get; set; }
         string buttonSeat;
         string smallBlindName;
         string bigBlindName;
@@ -31,8 +35,20 @@ namespace FileChecker.Models
                 {
                     StartChips = NewStackConstructor(player),
                     SeatNumber = player.SeatNumber,
-                    Name = player.Name
+                    Name = player.Name,
+                    Button = player.Button,
+                    BoolSmallBlind = player.BoolSmallBlind,
+                    BoolBigBlind = player.BoolBigBlind
                 });
+            }
+
+            for (int i = 0; i < NewDealPlayerList.Count; i++)
+            {
+                if (NewDealPlayerList[i].StartChips == 0)
+                {
+                    NewDealPlayerList.RemoveAt(i);
+                    PlayerCount--;
+                }
             }
             MoveButton();
             MoveSmallBlind();
@@ -40,38 +56,40 @@ namespace FileChecker.Models
         }
 
 
+
         public int NewStackConstructor(Player player) 
         {
-            int newStack;
             if (player.Collected > 0)
             {
-                newStack = player.StartChips + HistoryDeal.ActionSum - 
+                int newStack = player.StartChips + HistoryDeal.ActionSum - 
                            player.Raises - player.Posts - player.Calls -
                            player.IntBigBlind - player.IntSmallBlind - player.IntAnte;
                 return newStack;
             }
             else
             {
-                newStack = player.StartChips - player.Raises - player.Posts -
+                int newStack = player.StartChips - player.Raises - player.Posts -
                            player.Calls - player.IntBigBlind - player.IntSmallBlind - player.IntAnte;
                 return newStack;
-            } 
+            }
         }
 
         public void MoveButton() 
         {
-            foreach (var player in HistoryDealPlayerList)
+            foreach (var player in NewDealPlayerList)
             {
                 if (player.Button == true)
                 {
-                    int position = HistoryDealPlayerList.IndexOf(player);
+                    int position = NewDealPlayerList.IndexOf(player);
                     if (position >= NewDealPlayerList.Count-1)
                     {
+                        player.Button = false;
                         NewDealPlayerList[0].Button = true;
                         break;
                     }
                     else
                     {
+                        player.Button = false;
                         position++;
                         NewDealPlayerList[position].Button = true;
                         break;
@@ -82,19 +100,20 @@ namespace FileChecker.Models
 
         public void MoveSmallBlind()
         {
-            foreach (var player in HistoryDealPlayerList)
+            foreach (var player in NewDealPlayerList)
             {
                 if (player.BoolSmallBlind == true)
                 {
-                    int position = HistoryDealPlayerList.IndexOf(player);
-                    player.BoolSmallBlind = false;
+                    int position = NewDealPlayerList.IndexOf(player);
                     if (position >= NewDealPlayerList.Count-1)
                     {
+                        player.BoolSmallBlind = false;
                         NewDealPlayerList[0].BoolSmallBlind = true;
                         break;
                     }
                     else
                     {
+                        player.BoolSmallBlind = false;
                         position++;
                         NewDealPlayerList[position].BoolSmallBlind = true;
                         break;
@@ -105,19 +124,20 @@ namespace FileChecker.Models
 
         public void MoveBigBlind()
         {
-            foreach (var player in HistoryDealPlayerList)
+            foreach (var player in NewDealPlayerList)
             {
                 if (player.BoolBigBlind == true)
                 {
-                    int position = HistoryDealPlayerList.IndexOf(player);
-                    player.BoolBigBlind = false;
+                    int position = NewDealPlayerList.IndexOf(player);
                     if (position >= NewDealPlayerList.Count-1)
                     {
+                        player.BoolBigBlind = false;
                         NewDealPlayerList[0].BoolBigBlind = true;
                         break;
                     }
                     else
                     {
+                        player.BoolBigBlind = false;
                         position++;
                         NewDealPlayerList[position].BoolBigBlind = true;
                         break;
@@ -150,7 +170,7 @@ namespace FileChecker.Models
             newData += HistoryDeal.handHistoryList[2];
             newData += HistoryDeal.handHistoryList[3];
             newData += String.Format("Seat {0} is the button\r", buttonSeat);
-            newData += HistoryDeal.handHistoryList[5];
+            newData += String.Format("Total number of players : {0}\r", PlayerCount.ToString());
             foreach (var player in NewDealPlayerList)
             {
                 newData += String.Format("Seat {0}: {1} ({2})\r", player.SeatNumber.ToString(), player.Name.ToString(), player.StartChips.ToString());
@@ -162,7 +182,6 @@ namespace FileChecker.Models
             newData += String.Format("{0} posts small blind [{1}]\r", smallBlindName, HistoryDeal.SmallBlind.ToString());
             newData += String.Format("{0} posts big blind [{1}]\r", bigBlindName, HistoryDeal.BigBlind.ToString());
             newData += "** Dealing down cards **\r";
-            newData += "Dealt to busolegov [ Ah, As ]";
             return newData;
         }
 

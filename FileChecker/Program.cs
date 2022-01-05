@@ -14,8 +14,8 @@ namespace FileChecker
     {
         static void Main(string[] args)
         {
-            const string CURRENTPATH = @"C:\Users\6yc\Documents\888poker\HandHistory\busolegov";
-            const string NEWPATH = @"C:\Users\6yc\Desktop\newfolder";
+            const string CURRENTPATH = @"C:\Users\Gleborg\Documents\888poker\HandHistory\vatyan";
+            const string NEWPATH = @"C:\Users\Gleborg\Desktop\HH";
 
             try
             {

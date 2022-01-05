@@ -44,7 +44,7 @@ namespace FileChecker.Models
         {
             List<int> gameBlockIndex = new List<int>();
             string[] allLinesArray = TournamentHH.Split('\n');
-            for (int i = 0; i < allLinesArray.Length - 1; i++)
+            for (int i = 0; i < allLinesArray.Length; i++)
             {                                                                                   
                 if (allLinesArray[i].Contains("#Game No"))
                 {
@@ -52,9 +52,9 @@ namespace FileChecker.Models
                 }
             }
 
-            int count = (allLinesArray.Length - 3) - gameBlockIndex.Last();
+            int count = (allLinesArray.Length) - gameBlockIndex.Last();
             string[] lastGameBlockArray = new string[count];
-            for (int i = gameBlockIndex.Last(), k = 0; i < (allLinesArray.Length - 3); i++, k++)
+            for (int i = gameBlockIndex.Last(), k = 0; i < (allLinesArray.Length); i++, k++)
             {
                 handHistoryList.Add(allLinesArray[i]);
                 lastGameBlockArray[k] = allLinesArray[i];
@@ -156,18 +156,21 @@ namespace FileChecker.Models
         /// <returns></returns>
         public void GetNumberOfPlayers()
         {
-            char count = handHistoryList[5][26];
-            playerCount = Int32.Parse(count.ToString());
+            string[] numberString = handHistoryList[5].Split(new char[] {':'});
+            playerCount = Int32.Parse(numberString[1].ToString());
         }
 
         public void GetDealPlayersInfo(string line) 
         {
-            char number = line[5];
-            int seatNumber = Int32.Parse(number.ToString());
-            line = line.Substring(8);
-            Regex regexName = new Regex(@"(\S*)");
-            Match matchName = regexName.Match(line);
-            string name = matchName.Value;
+            string [] infoString = line.Split(new char [] {':'});
+            string[] seatString = infoString[0].Split(new char[] {' '});
+            int seatNumber = Int32.Parse(seatString[1].ToString());
+            string[] nameString = infoString[1].Split(new char[] {' '});
+            string name = nameString[1];
+            //line = line.Substring(8);
+            //Regex regexName = new Regex(@"(\S*)");
+            //Match matchName = regexName.Match(line);
+            //string name = matchName.Value;
             int chips = GetNumberInRoundBrackets(line);
             playersInGame.Add(new Player
             {
