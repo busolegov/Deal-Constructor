@@ -61,6 +61,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Анте.
+        /// </summary>
         public void GetAnte() 
         {
             foreach (var line in handHistoryList)
@@ -73,6 +76,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Позиция маленького блайнда.
+        /// </summary>
         public void GetSmallBlindPosition()
         {
             foreach (var line in handHistoryList)
@@ -95,6 +101,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Позиция большого блайнда.
+        /// </summary>
         public void GetBigBlindPosition()
         {
             foreach (var line in handHistoryList)
@@ -117,6 +126,9 @@ namespace FileChecker.Models
             }
         }
         
+        /// <summary>
+        /// Позиция баттона.
+        /// </summary>
         public void GetButtonPostion()
         {
             char seat = handHistoryList[4][5];
@@ -131,6 +143,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Установка анте и блайндов.
+        /// </summary>
         public void SetBlindsAndAnteToPlayer()
         {
             foreach (var player in playersInGame)
@@ -160,6 +175,10 @@ namespace FileChecker.Models
             playerCount = Int32.Parse(numberString[1].ToString());
         }
 
+        /// <summary>
+        /// Информация по раздаче.
+        /// </summary>
+        /// <param name="line"></param>
         public void GetDealPlayersInfo(string line) 
         {
             string [] infoString = line.Split(new char [] {':'});
@@ -183,11 +202,11 @@ namespace FileChecker.Models
         }
 
         /// <summary>
-        /// Выборка ников.
+        /// Выборка действий по никам.
         /// </summary>
         /// <param name="player"></param>
         /// <param name="line"></param>
-        public void ScanWithName(Player player, string line)
+        public void GetActionsWithName(Player player, string line)
         {
 
             if (line.Contains($"{player.Name} posts ["))
@@ -208,7 +227,10 @@ namespace FileChecker.Models
             }
         }
 
-        public void PlayersActionSum() 
+        /// <summary>
+        /// Подсчет суммы действий игроков
+        /// </summary>
+        public void GetPlayersActionSum() 
         {
             foreach (var player in playersInGame)
             {

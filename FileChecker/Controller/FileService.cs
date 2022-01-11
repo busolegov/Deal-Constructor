@@ -39,6 +39,7 @@ namespace FileChecker.Controller
             return filesArray;
         }
 
+
         /// <summary>
         /// Обрезка имени файла.
         /// </summary>
@@ -50,27 +51,6 @@ namespace FileChecker.Controller
             return path;
         }
 
-        /// <summary>
-        /// Метод определния времени последнего изменения файла
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public DateTime GetFileDate(string path)
-        {
-            FileInfo fileInfo = new FileInfo(path);
-            return fileInfo.LastWriteTime;
-        }
-
-        /// <summary>
-        /// Метод определения размера файла
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public byte GetFileSize(string path)
-        {
-            FileInfo fileInfo = new FileInfo(path);
-            return (byte)fileInfo.Length;
-        }
 
         public List<FileData> GetFilesList(string[] array) 
         {
@@ -86,29 +66,11 @@ namespace FileChecker.Controller
         }
 
 
-        /// <summary>
-        /// Метод сравнения размеров файлов - bool
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        public bool CompareFileDate(DateTime tempDate, DateTime date) 
-        {
-            if (tempDate > date)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public void GetStructure(HistoryPattern pattern) 
         {
             pattern.GetLastGameBlock();
             pattern.GetNumberOfPlayers();
-            pattern.PlayersActionSum();
+            pattern.GetPlayersActionSum();
             for (int i = 6; i < 6 + pattern.playerCount; i++)
             {
                 pattern.GetDealPlayersInfo(pattern.handHistoryList[i]);
@@ -118,7 +80,7 @@ namespace FileChecker.Controller
             {
                 foreach (var player in pattern.playersInGame)
                 {
-                    pattern.ScanWithName(player, pattern.handHistoryList[i]);
+                    pattern.GetActionsWithName(player, pattern.handHistoryList[i]);
                 }
             }
 
@@ -127,7 +89,7 @@ namespace FileChecker.Controller
             pattern.GetBigBlindPosition();
             pattern.GetButtonPostion();
             pattern.SetBlindsAndAnteToPlayer();
-            pattern.PlayersActionSum();
+            pattern.GetPlayersActionSum();
         }
 
 
@@ -149,11 +111,11 @@ namespace FileChecker.Controller
                     GetStructure(tournamentHistory);
 
                     NewDealConstructor newDeal = new NewDealConstructor(tournamentHistory);
-                    newDeal.PlayersConstructor();
+                    newDeal.GetPlayersData();
 
                     using (StreamWriter fileDataWriter = new StreamWriter(newPath, false, Encoding.UTF8))
                     {
-                        await fileDataWriter.WriteAsync(newDeal.NewDealTextConstructor());
+                        await fileDataWriter.WriteAsync(newDeal.GetNewDealText());
                     }
                 }
             }

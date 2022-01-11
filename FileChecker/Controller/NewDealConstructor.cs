@@ -13,7 +13,6 @@ namespace FileChecker.Models
             HistoryDealPlayerList = pattern.playersInGame;
             HistoryDeal = pattern;
             PlayerCount = pattern.playerCount;
-
         }
 
         public HistoryPattern HistoryDeal { get; set; }
@@ -26,14 +25,18 @@ namespace FileChecker.Models
         public List<Player> HistoryDealPlayerList { get; set; }
         public List<Player> NewDealPlayerList { get; set; }
         public List <string> StringNewDeal { get; set; }
-        public void PlayersConstructor() 
+
+        /// <summary>
+        /// Формирование текущей раздачи.
+        /// </summary>
+        public void GetPlayersData() 
         {
             NewDealPlayerList = new List<Player>();
             foreach (var player in HistoryDealPlayerList)
             {
                 NewDealPlayerList.Add(new Player
                 {
-                    StartChips = NewStackConstructor(player),
+                    StartChips = GetNewStack(player),
                     SeatNumber = player.SeatNumber,
                     Name = player.Name,
                     Button = player.Button,
@@ -55,9 +58,12 @@ namespace FileChecker.Models
             MoveBigBlind();
         }
 
-
-
-        public int NewStackConstructor(Player player) 
+        /// <summary>
+        /// Количество фишек игрока в текущей раздаче.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public int GetNewStack(Player player) 
         {
             if (player.Collected > 0)
             {
@@ -74,6 +80,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Перемещение позиции баттона.
+        /// </summary>
         public void MoveButton() 
         {
             foreach (var player in NewDealPlayerList)
@@ -98,6 +107,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Перемещение позиции маленького блайнда.
+        /// </summary>
         public void MoveSmallBlind()
         {
             foreach (var player in NewDealPlayerList)
@@ -122,6 +134,9 @@ namespace FileChecker.Models
             }
         }
 
+        /// <summary>
+        /// Перемещение позиции большого блайнда.
+        /// </summary>
         public void MoveBigBlind()
         {
             foreach (var player in NewDealPlayerList)
@@ -146,7 +161,11 @@ namespace FileChecker.Models
             }
         }
 
-        public string NewDealTextConstructor()
+        /// <summary>
+        /// Конструктор теста текущей раздачи.
+        /// </summary>
+        /// <returns></returns>
+        public string GetNewDealText()
         {
             foreach (var player in NewDealPlayerList)
             {
@@ -163,7 +182,6 @@ namespace FileChecker.Models
                     bigBlindName = player.Name;
                 }
             }
-
             string newData = "";
             newData += HistoryDeal.handHistoryList[0];
             newData += HistoryDeal.handHistoryList[1];
